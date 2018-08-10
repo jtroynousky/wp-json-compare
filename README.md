@@ -9,8 +9,6 @@ Use this repository to compare data across WP-JSON endpoints on two different si
 
 ## Example Commands
 
-`node taxonomy.js --endpoint=categories` -- Compare category objects
-
-`node post.js --endpoint=posts --maxPages=3` -- Compare the first three pages of posts
+`node taxonomy.js` -- Compare category objects
 
 Comparison results are saved to the `/logs/` folder.
