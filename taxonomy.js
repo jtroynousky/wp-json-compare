@@ -12,7 +12,7 @@ function recursiveCompare(page = 1, options) {
       orderby: 'id',
     },
     queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&'),
-    url = 'categories?' + queryString,
+    url = 'wp/v2/categories?' + queryString,
     maxPages = (typeof (options.maxPages) === 'number') ? options.maxPages : null,
     diff = base.getDiff(base.getWPJSON('a', url), base.getWPJSON('b', url));
 

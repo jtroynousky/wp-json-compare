@@ -53,7 +53,7 @@ function getWPJSON(site, endpoint) {
 
   // Determine the host to use
   var host = (site === 'b') ? process.env.WP_SITE_B : process.env.WP_SITE_A,
-    url = host + '/wp-json/wp/v2/' + endpoint;
+    url = host + '/wp-json/' + endpoint;
 
   /**
    *
