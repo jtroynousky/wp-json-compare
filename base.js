@@ -17,10 +17,6 @@ var winston = require('winston'),
   commandLineArgs = require('command-line-args'),
   optionDefinitions = [
     {
-      name: 'endpoint',
-      type: String
-    },
-    {
       name: 'maxPages',
       type: Number
     }

@@ -19,7 +19,7 @@ function recursiveCompare(page = 1, options) {
   // Get diff and query next page until they're all empty
   diff.then(function (results) {
 
-    // Bail if we've resached the max
+    // Bail if we've reached the max
     if (maxPages && page >= maxPages) {
       return;
     }
