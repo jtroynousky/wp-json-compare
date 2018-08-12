@@ -151,7 +151,9 @@ function getDiff(requestA, requestB) {
           }
         }
 
-        logger.log(entry);
+        if (entry.message.diff.length > 0) {
+          logger.log(entry);
+        }
 
         resolve(results);
       }, errorHandler);
