@@ -158,8 +158,8 @@ function indexWalker(startPage = 1) {
     url = `${program.siteA}/wp-json/wp/v2/${program.model}?` + queryString;
 
   // Exit if we are done with the requested number of pages
-  if (program.maxPages > 0 && page > program.maxPages) {
-    console.log(`Finished on page ${page} of max ${maxPages}`);
+  if (program.maxPages > 0 && params.page > program.maxPages) {
+    console.log(`Finished on page ${params.page} of max ${program.maxPages}`);
     process.exit();
   }
 
@@ -182,8 +182,8 @@ function indexWalker(startPage = 1) {
         .then(() => {
           requestCounter++;
           if (requestCounter >= wpObjectsCount) {
-            page++;
-            indexWalker(page, options);
+            params.page++;
+            indexWalker(params.page);
           }
         });
     });
