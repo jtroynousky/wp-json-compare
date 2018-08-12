@@ -48,6 +48,21 @@ function errorHandler() {
 }
 
 /**
+ * 
+ * @param {*} response 
+ */
+function domainFilter(response) {
+
+  var responseString = JSON.stringify(response);
+  var replacedString = responseString
+    .replace(new RegExp(program.siteB, 'g'), program.siteA)
+    .replace(new RegExp('https?:\/\/[a-z0-9]+\.files\.wordpress\.com', 'g'), program.siteA + '/wp-content/uploads');
+  result = JSON.parse(replacedString);
+
+  return result;
+}
+
+/**
  * Retrieve the individual model page
  */
 function getWPmodel(url) {
@@ -58,7 +73,6 @@ function getWPmodel(url) {
 
       request.get(url, (error, response, body) => {
 
-        // Reject errors returned; otherwise resolve the promise
         if (error) {
           reject(error);
         } else {
@@ -95,17 +109,16 @@ function getDiff(requestA, requestB) {
       .then(function (result) {
 
         if (typeof (result) === 'object' && JSON.stringify(result) !== '[]') {
-          results.objectA = result;
+
+          var filteredResult = domainFilter(result);
+          results.objectA = filteredResult;
         }
 
         promiseB.then(JSON.parse, errorHandler)
           .then(function (result) {
             if (typeof (result) === 'object' && JSON.stringify(result) !== '[]') {
-              // String replace Site B domain with Site A so we don't get false positives on mismatches
-              var resultString = JSON.stringify(result);
-              var replacedString = resultString.replace(new RegExp(program.siteB, 'g'), program.siteA);
-              result = JSON.parse(replacedString);
-              results.objectB = result;
+              var filteredResult = domainFilter(result);
+              results.objectB = filteredResult;
             }
           });
 
@@ -136,7 +149,7 @@ function getDiff(requestA, requestB) {
           }
         }
 
-        //logger.log(entry);
+        logger.log(entry);
 
         resolve(results);
       }, errorHandler);
@@ -171,7 +184,8 @@ function indexWalker(startPage = 1) {
 
   request(url, (error, response, body) => {
     if (error) {
-      console.error(error);
+      console.log('================'.rainbow)
+      console.log(`${error}`.red);
       process.exit();
     }
 
