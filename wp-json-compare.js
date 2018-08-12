@@ -197,6 +197,12 @@ function indexWalker(startPage = 1) {
       wpObjectsCount = wpObjects.length,
       requestCounter = 0;
 
+    if (wpObjects.length === 0) {
+      console.log('================'.rainbow)
+      console.log(`Finished on page: ${params.page}`.red);
+      process.exit();
+    }
+
     wpObjects.forEach(function (obj) {
       wpObjectURL = obj._links.self[0].href;
       wpObjectURLB = wpObjectURL.replace(program.siteA, program.siteB);
