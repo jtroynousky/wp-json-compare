@@ -56,7 +56,9 @@ function domainFilter(response) {
   var responseString = JSON.stringify(response);
   var replacedString = responseString
     .replace(new RegExp(program.siteB, 'g'), program.siteA)
-    .replace(new RegExp('https?:\/\/[a-z0-9]+\.files\.wordpress\.com', 'g'), program.siteA + '/wp-content/uploads');
+    .replace(new RegExp('https?:\/\/[a-z0-9]+\.files\.wordpress\.com', 'g'), program.siteA + '/wp-content/uploads')
+    .replace(new RegExp('https?:\/\/[a-z0-9]+\.wordpress\.com', 'g'), program.siteA);
+
   result = JSON.parse(replacedString);
 
   return result;
