@@ -4,11 +4,11 @@ Use this repository to compare data across WP-JSON endpoints on two different si
 
 ## Setup
 
-1. Do an `npm install`.
-2. Update the `.env` file to specify the two sites you'd like to compare.
+1. `npm install`.
 
 ## Example Commands
 
-`node taxonomy.js` -- Compare category objects
+`node wp-json-compare.js --model=post --siteA=http://somesite.com --siteB=https://anothersite.org`
+`node wp-json-compare.js --model=categories --siteA=http://somesite.com --siteB=https://anothersite.org`
 
 Comparison results are saved to the `/logs/` folder.
