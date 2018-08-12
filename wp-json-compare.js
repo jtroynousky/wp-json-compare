@@ -1,5 +1,6 @@
 const winston = require('winston');
 const request = require('request');
+const colors = require('colors');
 var diff = require('deep-diff').diff;
 var program = require('commander');
 
@@ -25,7 +26,7 @@ const logger = winston.createLogger({
 });
 
 if (program.siteA === undefined || program.siteB === undefined) {
-  console.log('Please specifiy both siteA and siteB as command line args.');
+  console.log('Please specifiy both siteA and siteB as command line args.'.red);
   process.exit();
 }
 
@@ -34,8 +35,10 @@ if (program.page === undefined) {
 }
 
 
-console.log(`Initializing wp-json-compare for model ${program.model}`)
-console.log(`Comparing ${program.siteA} -> ${program.siteB}`)
+console.log(`Initializing wp-json-compare for model ${program.model}`.green)
+console.log(`Comparing ${program.siteA} -> ${program.siteB}`.green)
+console.log(`Starting on page ${program.page}`.green)
+console.log('================'.rainbow)
 
 /**
  * Callback to log errors
@@ -133,7 +136,7 @@ function getDiff(requestA, requestB) {
           }
         }
 
-        logger.log(entry);
+        //logger.log(entry);
 
         resolve(results);
       }, errorHandler);
@@ -159,11 +162,12 @@ function indexWalker(startPage = 1) {
 
   // Exit if we are done with the requested number of pages
   if (program.maxPages > 0 && params.page > program.maxPages) {
-    console.log(`Finished on page ${params.page} of max ${program.maxPages}`);
+    console.log('================'.rainbow)
+    console.log(`Finished on max page: ${program.maxPages}`.red);
     process.exit();
   }
 
-  console.log(`Processing url ${url}`);
+  console.log(`Processing index url ${url}`.yellow);
 
   request(url, (error, response, body) => {
     if (error) {
