@@ -11,6 +11,7 @@ program
   .option('-b, --siteB [host]', 'Copied Site: https://second-site.com')
   .option('-p, --page [number]', 'Optional page to start')
   .option('-x, --maxPages [number]', 'Optional page to end')
+  .option('-t, --accessToken [string]', 'Optional OAuth2 access token')
   .parse(process.argv);
 
 const logger = winston.createLogger({
@@ -184,9 +185,21 @@ function indexWalker(startPage = 1) {
     process.exit();
   }
 
+  // Specify request parameters
+  var requestParams = {
+    url: url
+  };
+
+  // Add authentication headers if specified
+  if (program.accessToken !== undefined ) {
+    requestParams.headers = {
+      "Authorization" : "Bearer " + program.accessToken
+    }
+ }
+
   console.log(`Processing index url ${url}`.yellow);
 
-  request(url, (error, response, body) => {
+  request(requestParams, (error, response, body) => {
     if (error) {
       console.log('================'.rainbow)
       console.log(`${error}`.red);
