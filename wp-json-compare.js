@@ -11,7 +11,8 @@ program
   .option('-b, --siteB [host]', 'Copied Site: https://second-site.com')
   .option('-p, --page [number]', 'Optional page to start')
   .option('-x, --maxPages [number]', 'Optional page to end')
-  .option('-t, --accessToken [string]', 'Optional OAuth2 access token')
+  .option('-A, --accessTokenA [string]', 'Optional OAuth2 access token for site A')
+  .option('-B, --accessTokenB [string]', 'Optional OAuth2 access token for site B')
   .parse(process.argv);
 
 const logger = winston.createLogger({
@@ -68,13 +69,25 @@ function domainFilter(response) {
 /**
  * Retrieve the individual model page
  */
-function getWPmodel(url) {
+function getWPmodel(url, accessToken) {
 
   var getPromise = function () {
 
     return new Promise(function (resolve, reject) {
 
-      request.get(url, (error, response, body) => {
+      // Specify request parameters
+      var requestParams = {
+        url: url
+      };
+
+      // Add authentication headers if specified
+      if (accessToken !== undefined ) {
+        requestParams.headers = {
+          "Authorization" : "Bearer " + accessToken
+        }
+     }
+
+      request.get(requestParams, (error, response, body) => {
 
         if (error) {
           reject(error);
@@ -191,9 +204,9 @@ function indexWalker(startPage = 1) {
   };
 
   // Add authentication headers if specified
-  if (program.accessToken !== undefined ) {
+  if (program.accessTokenA !== undefined ) {
     requestParams.headers = {
-      "Authorization" : "Bearer " + program.accessToken
+      "Authorization" : "Bearer " + program.accessTokenA
     }
  }
 
@@ -219,7 +232,7 @@ function indexWalker(startPage = 1) {
     wpObjects.forEach(function (obj) {
       wpObjectURL = obj._links.self[0].href;
       wpObjectURLB = wpObjectURL.replace(program.siteA, program.siteB);
-      getDiff(getWPmodel(wpObjectURL), getWPmodel(wpObjectURLB))
+      getDiff(getWPmodel(wpObjectURL, program.accessTokenA), getWPmodel(wpObjectURLB, program.accessTokenB))
         .then(() => {
           requestCounter++;
           if (requestCounter >= wpObjectsCount) {
