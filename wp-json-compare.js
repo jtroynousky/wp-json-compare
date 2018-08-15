@@ -133,9 +133,14 @@ function getDiff(requestA, requestB) {
         var diffResults = diff(results.objectA, results.objectB, function (path, key) {
           var filter = false;
 
-          // Filter out count property
-          // @TODO make this is list of props that are filtered out across different models
-          if (key === 'count') {
+          // Filter out properties we do not want to test
+          var filteredKeys = ['count']
+
+          if (program.model === 'media') {
+            filteredKeys.push('guid');
+          }
+
+          if (filteredKeys.indexOf(key) > -1) {
             filter = true;
           }
 
