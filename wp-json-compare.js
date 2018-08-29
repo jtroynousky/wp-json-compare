@@ -3,6 +3,7 @@ const request = require('request');
 const colors = require('colors');
 var diff = require('deep-diff').diff;
 var program = require('commander');
+var isUrl = require('is-url');
 
 program
   .version('0.1.0')
@@ -11,6 +12,7 @@ program
   .option('-b, --siteB [host]', 'Copied Site: https://second-site.com')
   .option('-p, --page [number]', 'Optional page to start')
   .option('-x, --maxPages [number]', 'Optional page to end')
+  .option('-s, --skip [string]', 'Optional comma-separated object properties to skip')
   .option('-A, --accessTokenA [string]', 'Optional OAuth2 access token for site A')
   .option('-B, --accessTokenB [string]', 'Optional OAuth2 access token for site B')
   .parse(process.argv);
@@ -55,15 +57,67 @@ function errorHandler() {
  */
 function domainFilter(response) {
 
+  var siteA = program.siteA.replace('http:', '').replace('https:', ''),
+      siteB = program.siteB.replace('http:', '').replace('https:', '');
+
   var responseString = JSON.stringify(response);
   var replacedString = responseString
-    .replace(new RegExp(program.siteB, 'g'), program.siteA)
+    .replace(new RegExp(siteB, 'g'), siteA)
     .replace(new RegExp('https?:\/\/[a-z0-9]+\.files\.wordpress\.com', 'g'), program.siteA + '/wp-content/uploads')
-    .replace(new RegExp('https?:\/\/[a-z0-9]+\.wordpress\.com', 'g'), program.siteA);
+    .replace(new RegExp('https?:\/\/[a-z0-9]+\.wordpress\.com', 'g'), program.siteA)
+    .replace(new RegExp('https?:\/\/i[0-9]+.wp.com\/[a-z0-9-\.]+', 'g'), program.siteA);
 
   result = JSON.parse(replacedString);
 
   return result;
+}
+
+/**
+ *
+ * @param {*} response
+ */
+function entityFilter(response) {
+
+  if (typeof(response) === 'undefined') {
+    return response;
+  }
+
+  var responseString = JSON.stringify(response);
+
+  var replacedString = responseString
+    .replace('&nbsp;', ' ')
+    .replace('&#038;', ' ');
+
+  result = JSON.parse(replacedString);
+
+  return result;
+}
+
+/**
+ *
+ * @param {*} response
+ */
+function queryStringFilter(response) {
+
+  if (typeof(response) === 'object') {
+
+    // Loop through each object propertly
+    for (var k in response){
+      if (response.hasOwnProperty(k)) {
+        if(typeof(response[k]) === 'object'){
+
+          // Apply filter recursively to nested objects
+          response[k] = queryStringFilter(response[k]);
+        } else if (typeof(response[k]) === 'string' && isUrl(response[k])){
+
+          // Remove query string from URLs
+          response[k] = response[k].split("?")[0];
+        }
+      }
+    }
+  }
+
+  return response;
 }
 
 /**
@@ -154,8 +208,37 @@ function getDiff(requestA, requestB) {
             filteredKeys.push('guid');
           }
 
+          // Add skipped properties
+          if (typeof(program.skip) === 'string') {
+            var skip = program.skip.split(',');
+            if (skip.length > 0) {
+              filteredKeys = filteredKeys.concat(skip);
+            }
+          }
+
           if (filteredKeys.indexOf(key) > -1) {
             filter = true;
+          }
+
+          // Check some other conditions for filtering
+          if ( ! filter && JSON.stringify( results.objectA[key] ) !== JSON.stringify( results.objectB[key] ) ) {
+
+            // See if HTML entity encoding is causing some false positives
+            var dataA = entityFilter( results.objectA[key] );
+            var dataB = entityFilter( results.objectB[key] );
+            if ( JSON.stringify( dataA ) === JSON.stringify( dataB ) ) {
+              filter = true;
+            }
+
+            results.objectA[key]
+
+            if ( ! filter ) {
+              var dataA = queryStringFilter( results.objectA[key] );
+              var dataB = queryStringFilter( results.objectB[key] );
+              if ( JSON.stringify( dataA ) === JSON.stringify( dataB ) ) {
+                filter = true;
+              }
+            }
           }
 
           return filter;
