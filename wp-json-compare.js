@@ -230,8 +230,6 @@ function getDiff(requestA, requestB) {
               filter = true;
             }
 
-            results.objectA[key]
-
             if ( ! filter ) {
               var dataA = queryStringFilter( results.objectA[key] );
               var dataB = queryStringFilter( results.objectB[key] );
