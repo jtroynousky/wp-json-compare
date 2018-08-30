@@ -206,6 +206,7 @@ function getDiff(requestA, requestB) {
 
           if (program.model === 'media') {
             filteredKeys.push('guid');
+            filteredKeys.push('description');
           }
 
           // Add skipped properties
