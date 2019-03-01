@@ -48,7 +48,7 @@ console.log('================'.rainbow)
  * Callback to log errors
  */
 function errorHandler() {
-  //logger.log(error);
+  logger.log(error);
 }
 
 /**
