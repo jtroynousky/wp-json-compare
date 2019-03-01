@@ -48,7 +48,7 @@ console.log('================'.rainbow)
  * Callback to log errors
  */
 function errorHandler() {
-  logger.log(error);
+  //logger.log(error);
 }
 
 /**
@@ -209,6 +209,15 @@ function getDiff(requestA, requestB) {
             filteredKeys.push('description');
           }
 
+          if (program.model === 'posts') {
+            filteredKeys.push('guid');
+            filteredKeys.push('jetpack_publicize_message');
+            filteredKeys.push('jetpack_publicize_connections');
+            filteredKeys.push('jetpack_featured_media_url');
+            filteredKeys.push('jetpack_shortlink');
+            filteredKeys.push('jetpack-related-posts');
+          }
+          
           // Add skipped properties
           if (typeof(program.skip) === 'string') {
             var skip = program.skip.split(',');
